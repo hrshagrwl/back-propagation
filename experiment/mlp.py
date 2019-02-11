@@ -13,7 +13,7 @@ import src.network2 as network2
 import src.mnist_loader as loader
 import src.activation as act
 
-DATA_PATH = '../../../data/'
+DATA_PATH = '../data/'
 
 def get_args():
     parser = argparse.ArgumentParser()
