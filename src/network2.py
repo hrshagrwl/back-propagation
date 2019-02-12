@@ -22,6 +22,8 @@ import json
 import random
 import sys
 
+random.seed(12)
+
 import numpy as np
 
 from src.activation import sigmoid, sigmoid_prime
@@ -120,7 +122,7 @@ class Network(object):
             monitor_evaluation_cost=False,
             monitor_evaluation_accuracy=False,
             monitor_training_cost=False,
-            monitor_training_accuracy=False):
+            monitor_training_accuracy=True):
         """Train the neural network using mini-batch stochastic gradient
         descent.  The ``training_data`` is a list of tuples ``(x, y)``
         representing the training inputs and the desired outputs.  The
@@ -310,7 +312,7 @@ def load(filename):
     f.close()
     cost = getattr(sys.modules[__name__], data["cost"])
     net = Network(data["sizes"], cost=cost)
-    net.weights = [np.array(w) for w in data["weights"]]
+    net.weightsT = [np.array(w) for w in data["weights"]]
     net.biases = [np.array(b) for b in data["biases"]]
     return net
 

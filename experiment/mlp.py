@@ -25,8 +25,9 @@ def get_args():
                         help='Gradient check')
     parser.add_argument('--train', action='store_true',
                         help='Train the model')
-
-
+    parser.add_argument('--test', action='store_true',
+                        help='Test the model accuracy on testing dataset')
+                    
     return parser.parse_args()
 
 def load_data():
@@ -62,17 +63,44 @@ def main():
     # construct the network
     model = network2.Network([784, 20, 10])
     # train the network using SGD
-    model.SGD(
+    evaluation_cost, evaluation_accuracy, \
+            training_cost, training_accuracy = model.SGD(
         training_data=train_data,
         epochs=100,
-        mini_batch_size=128,
+        mini_batch_size=32,
         eta=1e-3,
-        lmbda = 0.0,
+        lmbda = 0.00,
         evaluation_data=valid_data,
         monitor_evaluation_cost=True,
         monitor_evaluation_accuracy=True,
         monitor_training_cost=True,
         monitor_training_accuracy=True)
+    
+    training_accuracy = list(map(lambda x: x/len(train_data[0]), training_accuracy))
+    evaluation_accuracy = list(map(lambda x: x/len(valid_data[0]), evaluation_accuracy))
+
+    plt.plot(training_accuracy, label='Training Accuracy')
+    plt.plot(evaluation_accuracy, label='Validation Accuracy')
+    plt.legend(loc='best')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.savefig('accuracy.png')
+
+    plt.clf()
+    plt.plot(training_cost, label='Training Cost')
+    plt.plot(evaluation_cost, label='Validation Cost')
+    plt.legend(loc='best')
+    plt.xlabel('Epoch')
+    plt.ylabel('Cost')
+    plt.savefig('cost.png')
+
+    model.save('final_model.json')
+
+def test_accuracy():
+    train_data, valid_data, test_data = load_data()
+    loaded_model = network2.load('final_model.json')
+    print(loaded_model.accuracy(test_data)/len(test_data[0]))
+    
 
 if __name__ == '__main__':
     FLAGS = get_args()
@@ -84,3 +112,5 @@ if __name__ == '__main__':
         main()
     if FLAGS.gradient:
         gradient_check()
+    if FLAGS.test:
+        test_accuracy()
